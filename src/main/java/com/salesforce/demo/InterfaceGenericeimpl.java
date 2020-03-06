@@ -56,8 +56,10 @@ String result="";
         try {
             //SalesForcePostApi obj=new SalesForcePostApi();
             // AuthResponseValue resp= obj.sendPOST("https://login.salesforce.com/services/oauth2/token");
+            InterfaceGenerice interfaceGenerice=new InterfaceGenericeimpl();
+
             HttpGet request = new HttpGet("https://ap16.salesforce.com/services/data/v32.0/sobjects/EventLogFile");
-            request.addHeader("Authorization","Bearer " +"00D2w000003NJou!AQYAQJ8ghhR2oJgoO6a0ZSh3d1BQSpuObQwK7QdbLXtIWpYyeWcj1PKWtRrGlLrzAIi_jbyqreDbro6446qB4kYG65euQMdw");
+            request.addHeader("Authorization","Bearer " +interfaceGenerice.getAccessToken("getAccess_token"));
             // obj.postCall();
 
 

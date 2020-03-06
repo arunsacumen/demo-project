@@ -48,12 +48,5 @@ public class TestUsingwireMock {
 
         verify(getRequestedFor(urlPathEqualTo("/salesforce/hello"))
                 .withHeader("Content-Type", equalTo("application/json")));
-      //  verify(postRequestedFor(urlEqualTo("/salesforce/hello"))
-            //    .withHeader("Content-Type", equalTo("application/json")));//.withRequestBody(matching("hello world")));
-
-       /* verify(postRequestedFor(urlMatching("/salesforce/hello"))
-                .withRequestBody(matching("Hello world!"))
-                .withHeader("Content-Type", notMatching("text/plain")));*/
-
     }
 }
