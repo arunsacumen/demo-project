@@ -18,62 +18,64 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 @Repository
-public class InterfaceGenericeimpl implements InterfaceGenerice {
+public class InterfaceGenericeimpl implements InterfaceGenerice,Constants {
 
+/*
+* To fetch Access token from post API call
+* else fetch full json response
+* */
     @Override
     public String getAccessToken(String arg1) throws IOException {
+        System.out.println("interfaceGenericimpl method getAccessToken executed");
+        String argValue="getAccess_token";
         AuthResponseValue  outputInClassObject;
         String result = "";
-        HttpPost post = new HttpPost("https://login.salesforce.com/services/oauth2/token");
+        HttpPost post = new HttpPost(tokenURL);
 
         List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type","password"));
-        urlParameters.add(new BasicNameValuePair("client_id","3MVG9n_HvETGhr3Du6ck5xE.hxjLFYw1B3dCCSJVDg0jkQa5e0siDfsRLWutJkmtdH2kZVQJR88TT4xuK5Ld_"));
-        urlParameters.add( new BasicNameValuePair("client_secret","A602E313D5A28046A19A8211E46CDFD54F20CD9E8852A54C76E1AC1A81853331"));
-        urlParameters.add( new BasicNameValuePair("username","arun.kumar@sacumen.com"));
-        urlParameters.add(new BasicNameValuePair("password","Arun@1234"));
+        urlParameters.add(new BasicNameValuePair(grantTypeName,grant_type));
+        urlParameters.add(new BasicNameValuePair(clientId,client_id));
+        urlParameters.add( new BasicNameValuePair(clientSecret,client_secret));
+        urlParameters.add( new BasicNameValuePair(userName,username));
+        urlParameters.add(new BasicNameValuePair(passWord,password));
 
         post.setEntity(new UrlEncodedFormEntity(urlParameters));
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(post)){
+
             result = EntityUtils.toString(response.getEntity());
         }
-        if(arg1.equals("getAccess_token")) {
+        //To get only access token using Gson object
+        if(arg1.equals(argValue)) {
             Gson g = new Gson();
             outputInClassObject = g.fromJson(result, AuthResponseValue.class);
-            System.out.println("returned Access token");
+
+            String output=outputInClassObject.getAccess_token();
+            System.out.println(output);
             return outputInClassObject.getAccess_token();
         }
-        System.out.println("not returnig Access token");
         return result;
     }
-
+    /*
+    * Event log file
+    * get API call response
+    * */
     @Override
     public String getEventLogFile() throws IOException {
+        CloseableHttpResponse response = null;
         CloseableHttpClient httpClient = HttpClients.createDefault();
 String result="";
-
         try {
-            //SalesForcePostApi obj=new SalesForcePostApi();
-            // AuthResponseValue resp= obj.sendPOST("https://login.salesforce.com/services/oauth2/token");
             InterfaceGenerice interfaceGenerice=new InterfaceGenericeimpl();
-
-            HttpGet request = new HttpGet("https://ap16.salesforce.com/services/data/v32.0/sobjects/EventLogFile");
+            HttpGet request = new HttpGet(eventLogFileURL);
             request.addHeader("Authorization","Bearer " +interfaceGenerice.getAccessToken("getAccess_token"));
-            // obj.postCall();
-
-
-            CloseableHttpResponse response = httpClient.execute(request);
-
-
+            response = httpClient.execute(request);
             try {
-
                 // Get HttpResponse Status
                 System.out.println("getProtocolVersion " + response.getProtocolVersion());              // HTTP/1.1
                 System.out.println("getStatusCode " + response.getStatusLine().getStatusCode());   // 200
                 System.out.println("getReasonPhrase " + response.getStatusLine().getReasonPhrase()); // OK
                 System.out.println("getStatusLine " + response.getStatusLine().toString());        // HTTP/1.1 200 OK
-
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     // return it as a String
@@ -82,11 +84,13 @@ String result="";
                 }
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
-
             }
         }catch (Exception e) {
             e.printStackTrace();
             }
+        finally {
+            response.close();
+        }
             return result;
         }
     }
